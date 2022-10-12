@@ -640,7 +640,7 @@ configureExCommand = configureCommand {
     commandDefaultFlags = (mempty, defaultConfigExFlags),
     commandOptions      = \showOrParseArgs ->
          liftOptions fst setFst
-         (filter ((`notElem` ["constraint", "dependency", "exact-configuration"])
+         (filter ((`notElem` ["constraint", "dependency", "promised-dependency", "exact-configuration"])
                   . optionName) $ configureOptions  showOrParseArgs)
       ++ liftOptions snd setSnd
          (configureExOptions showOrParseArgs ConstraintSourceCommandlineFlag)
@@ -1714,9 +1714,9 @@ installCommand = CommandUI {
   commandOptions      = \showOrParseArgs ->
        liftOptions get1 set1
        -- Note: [Hidden Flags]
-       -- hide "constraint", "dependency", and
+       -- hide "constraint", "dependency", "promised-dependency" and
        -- "exact-configuration" from the configure options.
-       (filter ((`notElem` ["constraint", "dependency"
+       (filter ((`notElem` ["constraint", "dependency", "promised-dependency"
                            , "exact-configuration"])
                 . optionName) $
                               configureOptions   showOrParseArgs)

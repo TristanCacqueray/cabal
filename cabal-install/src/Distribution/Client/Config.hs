@@ -144,6 +144,7 @@ import Distribution.Compat.Environment
          ( getEnvironment )
 import qualified Data.Map as M
 import qualified Data.ByteString as BS
+import Distribution.Client.ReplFlags
 
 --
 -- * Configuration saved in the config file
@@ -164,6 +165,7 @@ data SavedConfig = SavedConfig
     , savedTestFlags          :: TestFlags
     , savedBenchmarkFlags     :: BenchmarkFlags
     , savedProjectFlags       :: ProjectFlags
+    , savedReplMulti          :: Flag Bool
     } deriving Generic
 
 instance Monoid SavedConfig where
@@ -185,7 +187,8 @@ instance Semigroup SavedConfig where
     savedHaddockFlags      = combinedSavedHaddockFlags,
     savedTestFlags         = combinedSavedTestFlags,
     savedBenchmarkFlags    = combinedSavedBenchmarkFlags,
-    savedProjectFlags      = combinedSavedProjectFlags
+    savedProjectFlags      = combinedSavedProjectFlags,
+    savedReplMulti         = combinedSavedReplMulti
   }
     where
       -- This is ugly, but necessary. If we're mappending two config files, we
@@ -401,6 +404,7 @@ instance Semigroup SavedConfig where
         configConstraints         = lastNonEmpty configConstraints,
         -- TODO: NubListify
         configDependencies        = lastNonEmpty configDependencies,
+        configPromisedDependencies= lastNonEmpty configPromisedDependencies,
         -- TODO: NubListify
         configConfigurationsFlags = lastNonMempty configConfigurationsFlags,
         configTests               = combine configTests,
@@ -523,6 +527,8 @@ instance Semigroup SavedConfig where
         where
           combine      = combine'        savedBenchmarkFlags
           lastNonEmpty = lastNonEmpty'   savedBenchmarkFlags
+
+      combinedSavedReplMulti = combine' savedReplMulti id
 
       combinedSavedProjectFlags = ProjectFlags
         { flagProjectDir      = combine flagProjectDir
@@ -966,7 +972,7 @@ configFieldDescriptions src =
 
   ++ toSavedConfig liftConfigFlag
        (configureOptions ParseArgs)
-       (["builddir", "constraint", "dependency", "ipid"]
+       (["builddir", "constraint", "dependency", "promised-dependency", "ipid"]
         ++ map fieldName installDirsFields)
 
         -- This is only here because viewAsFieldDescr gives us a parser
@@ -1070,6 +1076,10 @@ configFieldDescriptions src =
        -- share the options or make then distinct. In any case
        -- they should probably be per-server.
 
+  ++ toSavedConfig liftReplFlag
+      [multiReplOption]
+      [] []
+
   ++ [ viewAsFieldDescr
        $ optionDistPref
        (configDistPref . savedConfigureFlags)
@@ -1083,6 +1093,7 @@ configFieldDescriptions src =
        )
        ParseArgs
      ]
+
 
   where
     toSavedConfig lift options exclusions replacements =
@@ -1180,6 +1191,10 @@ liftUploadFlag = liftField
 liftReportFlag :: FieldDescr ReportFlags -> FieldDescr SavedConfig
 liftReportFlag = liftField
   savedReportFlags (\flags conf -> conf { savedReportFlags = flags })
+
+liftReplFlag :: FieldDescr (Flag Bool) -> FieldDescr SavedConfig
+liftReplFlag = liftField
+  savedReplMulti (\flags conf -> conf { savedReplMulti = flags })
 
 parseConfig :: ConstraintSource
             -> SavedConfig

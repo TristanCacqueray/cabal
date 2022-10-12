@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric #-}
 module Distribution.Types.GivenComponent (
-  GivenComponent(..)
+  GivenComponent(..),
 ) where
 
 import Distribution.Compat.Prelude
@@ -21,7 +21,8 @@ data GivenComponent =
     { givenComponentPackage :: PackageName
     , givenComponentName    :: LibraryName -- --dependency is for libraries
                                            -- only, not for any component
-    , givenComponentId      :: ComponentId }
+    , givenComponentId      :: ComponentId
+    }
   deriving (Generic, Read, Show, Eq, Typeable)
 
 instance Binary GivenComponent

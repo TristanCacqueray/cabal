@@ -804,10 +804,6 @@ repl`` and ``Setup repl`` on sufficiently new versions of Cabal.)
 
 The ``repl-no-load`` flag disables the loading of target modules at startup.
 
-Currently, it is not supported to pass multiple targets to ``repl``
-(``repl`` will just successively open a separate GHCi session for
-each target.)
-
 It also provides a way to experiment with libraries without needing to download
 them manually or to install them globally.
 
@@ -844,6 +840,13 @@ cannot be excluded for technical reasons).
 The configuration information for the script is cached under the cabal directory
 and can be pre-built with ``cabal build path/to/script``.
 See ``cabal run`` for more information on scripts.
+
+.. option:: --enable-multi-repl
+
+    Allow starting GHCi with multiple targets.
+    This requires GHC with multiple home unit support (GHC-9.4+)
+
+    The closure of required components will be loaded.
 
 .. _cabal run:
 

@@ -187,6 +187,8 @@ jobs:
         run: sh validate.sh $FLAGS -s lib-tests
 
       - name: Validate lib-suite
+        # the Windows@9.6.1 problem is tracked at https://github.com/haskell/cabal/issues/8858
+        if: (runner.os != 'Windows')  || (matrix.ghc != '9.6.1')
         run: sh validate.sh $FLAGS -s lib-suite
 
       - name: Validate cli-tests
@@ -194,7 +196,8 @@ jobs:
         run: sh validate.sh $FLAGS -s cli-tests
 
       - name: Validate cli-suite
-        if: matrix.cli != 'false'
+        # the Windows@9.6.1 problem is tracked at https://github.com/haskell/cabal/issues/8858
+        if: ((runner.os != 'Windows')  || (matrix.ghc != '9.6.1')) && (matrix.cli != 'false')
         run: sh validate.sh $FLAGS -s cli-suite
 
   # The job below is a copy-paste of validate with the necessary tweaks
